@@ -1,4 +1,4 @@
-(defproject clj-systemtray "0.1.2"
+(defproject clj-systemtray "0.1.4"
   :description "Clojure interface to the awt systemtray interface."
   :url "https://github.com/mbsmith/clj-systemtray"
   :license {:name "Eclipse Public License"
