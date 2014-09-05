@@ -34,14 +34,6 @@
       (is (= (nth test-popup 3) "three") "Fourth item should be 'three'")
       (is (popup-menu? test-popup) "popup-menu? should recognize a popup-menu."))))
 
-;; I'm not currently aware of a great way to test the following function, but something
-;; is better than nothing.
-(deftest test-make-tray-icon!
-  (let [tray (make-tray-icon! (resource "icon.png")
-                              (popup-menu (menu-item "title" #(true))))]
-    (is (instance? java.awt.TrayIcon tray) "Should return a java.awt.TrayIcon object.")
-    (remove-tray-icon! tray)))
-
 
 
 

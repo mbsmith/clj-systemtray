@@ -1,5 +1,7 @@
 # clj-systemtray
 
+[![Build Status](https://travis-ci.org/mbsmith/clj-systemtray.svg)](https://travis-ci.org/mbsmith/clj-systemtray)
+
 A Clojure interface to the Java AWT SystemTray facilities.  This strives to provide
 a simple, functional way to interact with the system tray on various platforms.
 
