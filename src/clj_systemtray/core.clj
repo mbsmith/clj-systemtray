@@ -9,7 +9,7 @@
 ;; more seamless for clojure developers.
 ;;
 (ns clj-systemtray.core
-  (:import [java.awt SystemTray TrayIcon Toolkit PopupMenu MenuItem]
+  (:import [java.awt SystemTray TrayIcon Toolkit PopupMenu MenuItem Menu]
            [java.awt.event ActionListener]))
 
 ;; ## Platform checks
@@ -30,13 +30,11 @@
 
 ;; ## Defining the menu
 ;;
-;; The three main building blocks of a system tray menu are the popup menu
-;; itself, menu items, and separators.  There can often be much more to them
+;; The four main building blocks of a system tray menu are the popup menu
+;; itself, menus, menu items, and separators.  There can often be much more to them
 ;; than that, but I've decided to keep things simple for now.  Here is an
 ;; example of a small popup menu using the menu definitions.
 ;;
-;; It should be noted that currently submenus are not supported, but may be
-;; in the near future.
 (defn popup-menu?
   [v]
   (if (and (coll? v) (not (map? v)))
@@ -52,11 +50,27 @@
 
      (popup-menu
        (menu-item :title fn)
-       (menu-item :another-title another-fn)
+       (menu-item \"another title\" another-fn)
        (separator)
+       (menu \"more options\"
+         (menu-item \"deep item 1\" fn)
+         (menu-item \"deep item 2\" fn)
        (menu-item :exit-title exit-fn))"
   [& args]
   (cons :popup args))
+
+(defn menu?
+  [v]
+  (if (and (coll? v) (not (map? v)))
+    (and (keyword?  (first v))
+         (= (first v) :menu))
+    (and (keyword? v)
+         (= v :menu))))
+
+(defn menu
+  "Nested menus are possible. Each one has a title and contents. The title must be a string or keyword."
+  [title & contents]
+  (concat [:menu title] contents))
 
 (def menu-item? map?)
 
@@ -101,29 +115,49 @@
    The first, and only argument to this function is a menu constructed by the
    functions above."
   [menu-data]
-  (letfn [(add-menu [popup title fn]
-            (let [item (add-listener! (MenuItem. title) fn)]
-              (.add popup item)
-              (list item)))
-          (read-menu [menu popup acc]
-            (cond (or (nil? menu) (empty? menu)) acc
-                  (popup-menu? (first menu))
-                  (let [new-popup (PopupMenu.)]
-                    (read-menu (rest menu)
-                               new-popup
-                               (concat acc (list new-popup))))
-                  (menu-item? (first menu))
-                  (read-menu (rest menu)
-                             popup
-                             (concat acc
-                                     (add-menu popup
-                                               (name (first (keys (first menu))))
-                                               (first (vals (first menu))))))
-                  (separator? (first menu))
-                  (do
-                    (.addSeparator popup)
-                    (read-menu (rest menu) popup acc))))]
-    (read-menu menu-data nil nil)))
+  (letfn [(add-menu-item [parent title fn]
+                         (let [item (add-listener! (MenuItem. (name title)) fn)]
+                           (.add parent item)
+                           parent))
+          (add-menu [parent title]
+                    (let [menu (Menu. (name title))]
+                      (.add parent menu)
+                      menu))
+
+          (read-menu [descriptions parent-menu]
+                     (cond
+                       ; base case
+                       (or (nil? descriptions) (empty? descriptions))
+                       parent-menu
+
+                       ; root case
+                       (popup-menu? (first descriptions))
+                       (let [new-popup (PopupMenu.)]
+                         (read-menu (rest descriptions)
+                                    new-popup))
+
+                       ; nested menu case
+                       (menu? (first descriptions))
+                       (do
+                         (read-menu (drop 2 (first descriptions))
+                                    (add-menu parent-menu
+                                              (second (first descriptions))))
+                         (read-menu (rest descriptions)
+                                    parent-menu))
+
+                       ; menu item case
+                       (menu-item? (first descriptions))
+                       (read-menu (rest descriptions)
+                                  (add-menu-item parent-menu
+                                                 (first (keys (first descriptions)))
+                                                 (first (vals (first descriptions)))))
+
+                       ; separator case
+                       (separator? (first descriptions))
+                       (do
+                         (.addSeparator parent-menu)
+                         (read-menu (rest descriptions) parent-menu))))]
+    (read-menu menu-data nil)))
 
 ;; ## Dealing with the tray
 
@@ -148,7 +182,7 @@
         tray-icon (TrayIcon. (.getImage (Toolkit/getDefaultToolkit)
                                         icon-path))]
     (when menu
-      (.setPopupMenu tray-icon (first (process-menu menu))))
+      (.setPopupMenu tray-icon (process-menu menu)))
     (.setImageAutoSize tray-icon true)
     (.add tray tray-icon)
     tray-icon))

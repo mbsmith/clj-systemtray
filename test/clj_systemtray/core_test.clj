@@ -17,6 +17,13 @@
     (is (keyword? sep) "The output should be a keyword.")
     (is (= sep :separator) "The keyword should be :separator.")))
 
+(deftest test-submenu
+  (let [m (menu "full" "one" :two 3)
+        mt (menu "empty")]
+    (is (menu? m) "menu? should recognize a menu.")
+    (is (menu? mt) "menu? should recognize an empty menu.")
+    (is (= (menu "asdf" :contents) [:menu "asdf" :contents]) "A menu should contain :menu, it's title, and any other passed arguments")))
+
 (deftest test-popup-menu
   (is (instance? clojure.lang.PersistentList (popup-menu))
       "Empty popup-menu should be a persistent list.")
