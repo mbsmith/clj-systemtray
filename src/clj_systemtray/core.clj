@@ -39,9 +39,9 @@
   [v]
   (if (and (coll? v) (not (map? v)))
     (and (keyword?  (first v))
-         (= (name (first v)) "popup"))
+         (= (first v) :popup))
     (and (keyword? v)
-         (= (name v) "popup"))))
+         (= v :popup))))
 
 (defn popup-menu
   "Every menu definition should be enclosed within a popup-menu expression.
@@ -76,8 +76,7 @@
 
 (defn menu-item
   "Most of the menu is going to be composed of menu-items.  Each one has a title
-   and a corresponding function.  The function is *not* mandatory however.  The
-   title should be a keyword;  E.g. :title."
+   and a mandatory corresponding function. The title must be a string or keyword."
   [title fn]
   {title fn})
 
