@@ -54,7 +54,7 @@
        (separator)
        (menu \"more options\"
          (menu-item \"deep item 1\" fn)
-         (menu-item \"deep item 2\" fn)
+         (menu-item \"deep item 2\" fn))
        (menu-item :exit-title exit-fn))"
   [& args]
   (cons :popup args))
