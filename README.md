@@ -21,15 +21,22 @@ following in your project.clj
 
 Usage is pretty straight forward.  Menus are described using composable functions.
 
-        (popup-menu
-		(menu-item :title fn)
-		(menu-item :another-title another-fn)
-		(separator)
-		(menu-item :Exit exit-fn))
+    (popup-menu
+        (menu-item :title fcn)
+        (menu-item "another title" another-fn)
+        (separator)
+        (menu "more options"
+            (menu-item "deep item 1" fcn)
+            (menu-item "deep item 2" fcn)
+            (separator)
+            (menu-item :deep-item-3 fcn))
+        (menu-item :exit-title exit-fn))
 
 This can then be used with the tray icon like so:
 
      (make-tray-icon! path-to-icon popup-menu)
+
+![image](https://cloud.githubusercontent.com/assets/56411/6353164/9df71070-bc15-11e4-9114-e22e1e1e450d.png)
 
 ## License
 
