@@ -17,7 +17,7 @@ For full documentation see http://mbsmith.github.io/clj-systemtray
 To obtain and use this in your project (via leiningen 2) put the include the
 following in your project.clj
 
-	  [clj-systemtray "0.1.4"]
+	  [clj-systemtray "0.2.1"]
 
 Usage is pretty straight forward.  Menus are described using composable functions.
 
