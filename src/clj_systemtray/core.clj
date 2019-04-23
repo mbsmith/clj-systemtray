@@ -25,7 +25,7 @@
    if a tray isn't found.  Should generally be used within any function that
     actually performs actions on the system tray."
   []
-  (when-not tray-supported?
+  (when-not (tray-supported?)
     (throw (Exception. "SystemTray not supported on this platform."))))
 
 ;; ## Defining the menu
