@@ -179,7 +179,7 @@
   (tray-or-throw!)
   (let [tray (SystemTray/getSystemTray)
         tray-icon (TrayIcon. (.getImage (Toolkit/getDefaultToolkit)
-                                        icon-path))]
+                                        ^String icon-path))]
     (when menu
       (.setPopupMenu tray-icon (process-menu menu)))
     (.setImageAutoSize tray-icon true)
@@ -209,16 +209,3 @@
                    :warning java.awt.TrayIcon$MessageType/WARNING
                    :error java.awt.TrayIcon$MessageType/ERROR)]
     (.displayMessage tray-icon caption message msg-type)))
-
-
-
-
-
-
-
-
-
-
-
-
-
