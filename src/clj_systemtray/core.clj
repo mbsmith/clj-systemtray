@@ -160,6 +160,20 @@
 
 ;; ## Dealing with the tray
 
+;; avoid reflection (Toolkit/getImage accepts a String or a URL)
+(defmulti get-image!
+  (fn [icon-path] (class icon-path)))
+
+(defmethod get-image! java.net.URL
+  [^java.net.URL icon-path]
+  (.getImage (Toolkit/getDefaultToolkit)
+             icon-path))
+
+(defmethod get-image! String
+  [^String icon-path]
+  (.getImage (Toolkit/getDefaultToolkit)
+             icon-path))
+
 (defn make-tray-icon!
   "Now with the previous functions defined we can finally create the tray icon.
    This function takes two arguments.  The first one being the path to the icon
@@ -178,8 +192,7 @@
   [icon-path menu]
   (tray-or-throw!)
   (let [tray (SystemTray/getSystemTray)
-        tray-icon (TrayIcon. (.getImage (Toolkit/getDefaultToolkit)
-                                        ^String icon-path))]
+        tray-icon (TrayIcon. (get-image! icon-path))]
     (when menu
       (.setPopupMenu tray-icon (process-menu menu)))
     (.setImageAutoSize tray-icon true)
